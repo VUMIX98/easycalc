@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор с вычислением столбиком</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        .calculator {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        input, select, button {
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        input {
+            flex: 1;
+            min-width: 120px;
+            background-color: #f9f9f9;
+        }
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        select {
+            width: 80px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+        }
+        button {
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 14px 25px;
+            width: 100%;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .result-section {
+            margin-top: 25px;
+        }
+        .calculation {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+            font-size: 18px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .error {
+            color: #e74c3c;
+            background-color: #ffeaea;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #e74c3c;
+        }
+        .explanation {
+            margin-top: 15px;
+            font-style: italic;
+            color: #7f8c8d;
+            background-color: #f1f8ff;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .operation-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        @media (max-width: 500px) {
+            .calculator {
+                padding: 20px;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            input, select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Калькулятор с вычислением столбиком</h1>
+        
+        <div class="input-section">
+            <div class="input-row">
+                <input type="number" id="num1" placeholder="Первое число" value="1234">
+                <select id="operation">
+                    <option value="+">+</option>
+                    <option value="-">-</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                </select>
+                <input type="number" id="num2" placeholder="Второе число" value="567">
+            </div>
+            <button id="calculate">Вычислить</button>
+        </div>
+        
+        <div class="result-section" id="result">
+            <div class="operation-title" id="operationTitle">Выберите операцию и нажмите "Вычислить"</div>
+            <div class="calculation" id="calculationDisplay">
+                Результат вычислений появится здесь
+            </div>
+            <div class="explanation" id="explanation">
+                Введите числа, выберите операцию и нажмите "Вычислить", чтобы увидеть пошаговое решение.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('calculate').addEventListener('click', function() {
+            const num1 = document.getElementById('num1').value;
+            const num2 = document.getElementById('num2').value;
+            const operation = document.getElementById('operation').value;
+            const resultDiv = document.getElementById('result');
+            const calculationDisplay = document.getElementById('calculationDisplay');
+            const explanation = document.getElementById('explanation');
+            const operationTitle = document.getElementById('operationTitle');
+            
+            // Проверка ввода
+            if (num1 === '' || num2 === '') {
+                calculationDisplay.innerHTML = '<div class="error">Пожалуйста, введите оба числа</div>';
+                return;
+            }
+            
+            const a = parseFloat(num1);
+            const b = parseFloat(num2);
+            
+            if (isNaN(a) || isNaN(b)) {
+                calculationDisplay.innerHTML = '<div class="error">Пожалуйста, введите корректные числа</div>';
+                return;
+            }
+            
+            if (operation === '/' && b === 0) {
+                calculationDisplay.innerHTML = '<div class="error">Деление на ноль невозможно</div>';
+                return;
+            }
+            
+            // Выполнение операции и отображение решения
+            let calculation, explanationText;
+            const operationSymbols = {
+                '+': '+',
+                '-': '-',
+                '*': '×',
+                '/': '÷'
+            };
+            
+            operationTitle.textContent = `Операция: ${a} ${operationSymbols[operation]} ${b}`;
+            
+            switch(operation) {
+                case '+':
+                    calculation = additionColumn(a, b);
+                    explanationText = "Сложение столбиком: складываем цифры по разрядам справа налево, переносим десятки в следующий разряд.";
+                    break;
+                case '-':
+                    calculation = subtractionColumn(a, b);
+                    explanationText = "Вычитание столбиком: вычитаем цифры по разрядам справа налево, занимаем единицы из старших разрядов при необходимости.";
+                    break;
+                case '*':
+                    calculation = multiplicationColumn(a, b);
+                    explanationText = "Умножение столбиком: умножаем первое число на каждую цифру второго числа, начиная с младшего разряда, складываем результаты со сдвигом.";
+                    break;
+                case '/':
+                    calculation = divisionColumn(a, b);
+                    explanationText = "Деление столбиком: последовательно находим, сколько раз делитель помещается в текущей части делимого.";
+                    break;
+            }
+            
+            calculationDisplay.textContent = calculation;
+            explanation.textContent = explanationText;
+        });
+        
+        function additionColumn(a, b) {
+            const result = a + b;
+            const aStr = a.toString();
+            const bStr = b.toString();
+            const resultStr = result.toString();
+            
+            const maxLength = Math.max(aStr.length, bStr.length + 1, resultStr.length);
+            
+            let calculation = "";
+            calculation += " ".repeat(maxLength - aStr.length) + aStr + "\n";
+            calculation += "+" + " ".repeat(maxLength - bStr.length - 1) + bStr + "\n";
+            calculation += "-".repeat(maxLength) + "\n";
+            calculation += " ".repeat(maxLength - resultStr.length) + resultStr;
+            
+            return calculation;
+        }
+        
+        function subtractionColumn(a, b) {
+            // Убедимся, что a >= b для корректного отображения столбиком
+            if (a < b) {
+                return "Для вычитания столбиком первое число должно быть больше или равно второму.\nПоменяйте числа местами или используйте отрицательный результат.";
+            }
+            
+            const result = a - b;
+            const aStr = a.toString();
+            const bStr = b.toString();
+            const resultStr = result.toString();
+            
+            const maxLength = Math.max(aStr.length, bStr.length + 1, resultStr.length);
+            
+            let calculation = "";
+            calculation += " ".repeat(maxLength - aStr.length) + aStr + "\n";
+            calculation += "-" + " ".repeat(maxLength - bStr.length - 1) + bStr + "\n";
+            calculation += "-".repeat(maxLength) + "\n";
+            calculation += " ".repeat(maxLength - resultStr.length) + resultStr;
+            
+            return calculation;
+        }
+        
+        function multiplicationColumn(a, b) {
+            const result = a * b;
+            const aStr = a.toString();
+            const bStr = b.toString();
+            const resultStr = result.toString();
+            
+            // Для простоты отображения ограничимся небольшими числами
+            if (bStr.length > 3) {
+                return "Для наглядности умножение столбиком отображается\nтолько для чисел с небольшим количеством разрядов.\n\nРезультат: " + result;
+            }
+            
+            const maxLength = Math.max(aStr.length, bStr.length + 1, resultStr.length);
+            
+            let calculation = "";
+            calculation += " ".repeat(maxLength - aStr.length) + aStr + "\n";
+            calculation += "×" + " ".repeat(maxLength - bStr.length - 1) + bStr + "\n";
+            calculation += "-".repeat(maxLength) + "\n";
+            
+            // Промежуточные вычисления для умножения
+            if (bStr.length > 1) {
+                for (let i = bStr.length - 1; i >= 0; i--) {
+                    const digit = parseInt(bStr[i]);
+                    const intermediate = a * digit;
+                    const intermediateStr = intermediate.toString();
+                    calculation += " ".repeat(maxLength - intermediateStr.length - (bStr.length - 1 - i)) + intermediateStr + "\n";
+                }
+                calculation += "-".repeat(maxLength) + "\n";
+            }
+            
+            calculation += " ".repeat(maxLength - resultStr.length) + resultStr;
+            
+            return calculation;
+        }
+        
+        function divisionColumn(a, b) {
+            const result = a / b;
+            
+            // Для целочисленного деления
+            if (Number.isInteger(result)) {
+                const quotient = Math.floor(result);
+                const quotientStr = quotient.toString();
+                
+                let calculation = "";
+                calculation += ` ${a} │ ${b}\n`;
+                calculation += `-${b * quotient} │ ${quotient}\n`;
+                calculation += "---\n";
+                calculation += "  0";
+                
+                return calculation;
+            } else {
+                // Для нецелочисленного деления
+                const quotient = Math.floor(result);
+                const remainder = a % b;
+                
+                let calculation = "";
+                calculation += ` ${a} │ ${b}\n`;
+                calculation += `-${b * quotient} │ ${result.toFixed(2)}\n`;
+                calculation += "---\n";
+                calculation += `  ${remainder}`;
+                
+                return calculation;
+            }
+        }
+        
+        // Автоматически вычисляем при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('calculate').click();
+        });
+    </script>
+</body>
+</html>
