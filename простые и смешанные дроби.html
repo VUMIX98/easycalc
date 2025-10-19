@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор дробей и смешанных чисел</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .calculator {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .input-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+        
+        .fraction-container {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            gap: 10px;
+        }
+        
+        .mixed-number {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mixed-input {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .mixed-input input {
+            width: 60px;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .fraction-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .fraction-display input {
+            width: 80px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .fraction-line {
+            width: 80px;
+            height: 2px;
+            background: #333;
+            margin: 5px 0;
+        }
+        
+        .operator {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .operator select {
+            font-size: 20px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .mixed-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin: 15px 0;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .result-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            min-height: 120px;
+        }
+        
+        .result-mixed {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+        
+        .result-fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .result-whole {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .result-numerator, .result-denominator {
+            font-size: 20px;
+            padding: 0 10px;
+        }
+        
+        .result-line {
+            width: 60px;
+            height: 2px;
+            background: #764ba2;
+            margin: 5px 0;
+        }
+        
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin: 10px 0;
+            min-height: 20px;
+            font-weight: bold;
+        }
+        
+        .examples {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+        
+        .examples h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .examples ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+        
+        .examples li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .simple-fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="header">
+            <h1>Калькулятор дробей</h1>
+            <div class="subtitle">Работает с простыми и смешанными числами</div>
+        </div>
+        
+        <div class="input-section">
+            <!-- Первая дробь -->
+            <div class="fraction-container">
+                <div class="mixed-number">
+                    <div class="mixed-input hidden" id="mixedInput1">
+                        <input type="number" id="whole1" placeholder="Целая" value="1">
+                    </div>
+                    
+                    <div class="fraction-display">
+                        <input type="number" id="numerator1" placeholder="Числитель" value="2">
+                        <div class="fraction-line"></div>
+                        <input type="number" id="denominator1" placeholder="Знаменатель" value="3">
+                    </div>
+                </div>
+                
+                <div class="mixed-checkbox">
+                    <input type="checkbox" id="mixed1">
+                    <label for="mixed1">Смешанное число</label>
+                </div>
+            </div>
+            
+            <!-- Оператор -->
+            <div class="operator">
+                <select id="operator">
+                    <option value="+">+</option>
+                    <option value="-">-</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                </select>
+            </div>
+            
+            <!-- Вторая дробь -->
+            <div class="fraction-container">
+                <div class="mixed-number">
+                    <div class="mixed-input hidden" id="mixedInput2">
+                        <input type="number" id="whole2" placeholder="Целая" value="1">
+                    </div>
+                    
+                    <div class="fraction-display">
+                        <input type="number" id="numerator2" placeholder="Числитель" value="1">
+                        <div class="fraction-line"></div>
+                        <input type="number" id="denominator2" placeholder="Знаменатель" value="4">
+                    </div>
+                </div>
+                
+                <div class="mixed-checkbox">
+                    <input type="checkbox" id="mixed2">
+                    <label for="mixed2">Смешанное число</label>
+                </div>
+            </div>
+        </div>
+        
+        <button class="calculate-btn" id="calculate">ВЫЧИСЛИТЬ</button>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result">
+            <div class="result-title">Результат:</div>
+            <div class="result-display" id="result">
+                <div class="result-mixed">
+                    <div class="result-whole" id="resultWhole"></div>
+                    <div class="result-fraction">
+                        <div class="result-numerator" id="resultNumerator"></div>
+                        <div class="result-line" id="resultLine"></div>
+                        <div class="result-denominator" id="resultDenominator"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="examples">
+            <h3>Примеры использования:</h3>
+            <ul>
+                <li><strong>Смешанные числа:</strong> 1²/₃ + 1¹/₄ = 2¹¹/₁₂</li>
+                <li><strong>Простая дробь:</strong> ³/₄ + ¹/₂ = ⁵/₄ или 1¹/₄</li>
+                <li><strong>Вычитание:</strong> 2¹/₃ - 1¹/₂ = ⁵/₆</li>
+                <li><strong>Умножение:</strong> ¹/₂ × ³/₄ = ³/₈</li>
+                <li><strong>Деление:</strong> ³/₄ ÷ ¹/₂ = ³/₂ или 1¹/₂</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы управления
+            const mixed1 = document.getElementById('mixed1');
+            const mixed2 = document.getElementById('mixed2');
+            const mixedInput1 = document.getElementById('mixedInput1');
+            const mixedInput2 = document.getElementById('mixedInput2');
+            const whole1 = document.getElementById('whole1');
+            const whole2 = document.getElementById('whole2');
+            const numerator1 = document.getElementById('numerator1');
+            const denominator1 = document.getElementById('denominator1');
+            const numerator2 = document.getElementById('numerator2');
+            const denominator2 = document.getElementById('denominator2');
+            const operator = document.getElementById('operator');
+            const calculateBtn = document.getElementById('calculate');
+            
+            // Элементы результата
+            const resultWhole = document.getElementById('resultWhole');
+            const resultNumerator = document.getElementById('resultNumerator');
+            const resultLine = document.getElementById('resultLine');
+            const resultDenominator = document.getElementById('resultDenominator');
+            const resultDisplay = document.getElementById('result');
+            const error = document.getElementById('error');
+            
+            // Показываем/скрываем поля для целой части
+            function toggleMixedInputs() {
+                mixedInput1.classList.toggle('hidden', !mixed1.checked);
+                mixedInput2.classList.toggle('hidden', !mixed2.checked);
+            }
+            
+            mixed1.addEventListener('change', toggleMixedInputs);
+            mixed2.addEventListener('change', toggleMixedInputs);
+            
+            // Наибольший общий делитель
+            function gcd(a, b) {
+                return b ? gcd(b, a % b) : Math.abs(a);
+            }
+            
+            // Сокращение дроби
+            function reduceFraction(numerator, denominator) {
+                if (numerator === 0) return { numerator: 0, denominator: 1 };
+                
+                const divisor = gcd(Math.abs(numerator), Math.abs(denominator));
+                return {
+                    numerator: numerator / divisor,
+                    denominator: denominator / divisor
+                };
+            }
+            
+            // Преобразование смешанного числа в неправильную дробь
+            function mixedToImproper(whole, numerator, denominator) {
+                const sign = whole < 0 ? -1 : 1;
+                const absWhole = Math.abs(whole);
+                return {
+                    numerator: (absWhole * denominator + numerator) * sign,
+                    denominator: denominator
+                };
+            }
+            
+            // Отображение результата
+            function displayResult(numerator, denominator) {
+                // Сначала сокращаем дробь
+                const reduced = reduceFraction(numerator, denominator);
+                let num = reduced.numerator;
+                let den = reduced.denominator;
+                
+                // Очищаем предыдущий результат
+                resultWhole.textContent = '';
+                resultNumerator.textContent = '';
+                resultLine.style.display = 'block';
+                resultDenominator.textContent = '';
+                
+                // Определяем знак
+                const isNegative = num < 0;
+                if (isNegative) num = Math.abs(num);
+                
+                // Выделяем целую часть
+                const wholePart = Math.floor(num / den);
+                const remainder = num % den;
+                
+                if (remainder === 0) {
+                    // Если дробь равна целому числу
+                    resultWhole.textContent = isNegative ? `-${wholePart}` : wholePart;
+                    resultLine.style.display = 'none';
+                    resultNumerator.textContent = '';
+                    resultDenominator.textContent = '';
+                } else if (wholePart === 0) {
+                    // Если дробь правильная
+                    resultWhole.textContent = '';
+                    resultNumerator.textContent = isNegative ? `-${num}` : num;
+                    resultDenominator.textContent = den;
+                } else {
+                    // Если дробь неправильная - показываем как смешанное число
+                    resultWhole.textContent = isNegative ? `-${wholePart}` : wholePart;
+                    resultNumerator.textContent = remainder;
+                    resultDenominator.textContent = den;
+                }
+            }
+            
+            // Основная функция вычисления
+            function calculate() {
+                error.textContent = '';
+                
+                try {
+                    // Получаем значения
+                    let num1, den1, num2, den2;
+                    
+                    // Первая дробь
+                    if (mixed1.checked) {
+                        const w1 = parseInt(whole1.value) || 0;
+                        const n1 = parseInt(numerator1.value) || 0;
+                        den1 = parseInt(denominator1.value) || 1;
+                        
+                        if (den1 === 0) throw new Error('Знаменатель не может быть нулем');
+                        if (n1 < 0) throw new Error('Числитель не может быть отрицательным в смешанном числе');
+                        
+                        const improper1 = mixedToImproper(w1, n1, den1);
+                        num1 = improper1.numerator;
+                        den1 = improper1.denominator;
+                    } else {
+                        num1 = parseInt(numerator1.value) || 0;
+                        den1 = parseInt(denominator1.value) || 1;
+                        if (den1 === 0) throw new Error('Знаменатель не может быть нулем');
+                    }
+                    
+                    // Вторая дробь
+                    if (mixed2.checked) {
+                        const w2 = parseInt(whole2.value) || 0;
+                        const n2 = parseInt(numerator2.value) || 0;
+                        den2 = parseInt(denominator2.value) || 1;
+                        
+                        if (den2 === 0) throw new Error('Знаменатель не может быть нулем');
+                        if (n2 < 0) throw new Error('Числитель не может быть отрицательным в смешанном числе');
+                        
+                        const improper2 = mixedToImproper(w2, n2, den2);
+                        num2 = improper2.numerator;
+                        den2 = improper2.denominator;
+                    } else {
+                        num2 = parseInt(numerator2.value) || 0;
+                        den2 = parseInt(denominator2.value) || 1;
+                        if (den2 === 0) throw new Error('Знаменатель не может быть нулем');
+                    }
+                    
+                    let resultNumerator, resultDenominator;
+                    
+                    // Выполняем операцию
+                    switch (operator.value) {
+                        case '+':
+                            resultNumerator = num1 * den2 + num2 * den1;
+                            resultDenominator = den1 * den2;
+                            break;
+                        case '-':
+                            resultNumerator = num1 * den2 - num2 * den1;
+                            resultDenominator = den1 * den2;
+                            break;
+                        case '*':
+                            resultNumerator = num1 * num2;
+                            resultDenominator = den1 * den2;
+                            break;
+                        case '/':
+                            if (num2 === 0) throw new Error('Деление на ноль невозможно');
+                            resultNumerator = num1 * den2;
+                            resultDenominator = den1 * num2;
+                            break;
+                    }
+                    
+                    // Отображаем результат
+                    displayResult(resultNumerator, resultDenominator);
+                    
+                } catch (e) {
+                    error.textContent = e.message;
+                    // Очищаем результат при ошибке
+                    resultWhole.textContent = '';
+                    resultNumerator.textContent = '';
+                    resultLine.style.display = 'none';
+                    resultDenominator.textContent = '';
+                }
+            }
+            
+            // Обработчики событий
+            calculateBtn.addEventListener('click', calculate);
+            
+            // Пересчитываем при изменении любых значений
+            [mixed1, mixed2, whole1, whole2, numerator1, denominator1, numerator2, denominator2, operator]
+                .forEach(element => {
+                    element.addEventListener('change', calculate);
+                    if (element.tagName === 'INPUT') {
+                        element.addEventListener('input', calculate);
+                    }
+                });
+            
+            // Инициализация
+            toggleMixedInputs();
+            calculate(); // Вычисляем сразу при загрузке
+        });
+    </script>
+</body>
+</html>
